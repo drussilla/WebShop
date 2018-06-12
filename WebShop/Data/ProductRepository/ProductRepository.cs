@@ -15,6 +15,9 @@ namespace WebShop.Data.ProductRepository
 
         public async Task AddOrUpdate(Product product)
         {
+            // it's not the most optimial way to add or update the entity, 
+            // one of the way to optimize this is to use Key as primary key and 
+            // execute INSERT OR UPDATE statement (but still need to take concurency in to account)
             var existingItem = await _context.Products.FirstOrDefaultAsync(x => x.Key.Equals(product.Key));
             if (existingItem != null)
             {
@@ -34,7 +37,10 @@ namespace WebShop.Data.ProductRepository
                 product.Id = Guid.NewGuid();
                 await _context.Products.AddAsync(product);
             }
+        }
 
+        public async Task Save()
+        {
             await _context.SaveChangesAsync();
         }
     }

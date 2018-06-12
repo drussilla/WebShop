@@ -57,6 +57,8 @@ namespace WebShop.Services.ProductImporter
                     await _productRepository.AddOrUpdate(parsingResult.Product);
                     result.ImportedItems++;
                 }
+
+                await _productRepository.Save();
             }
 
             return result;
