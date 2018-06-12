@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Upload file with prices";
+}
+
+@section Scripts
+{
+    <script>
+
+        function renderResults(data) {
+
+            var resultHtml = "";
+            // we can send multiple files at the same time, so result will be per file
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].importedItems > 0 && data[i].skippedItems === 0) {
+                    resultHtml += "<span class='label label-success'>" +
+                        data[i].importedItems +
+                        " items successfully imported</span>";
+                } else if (data[i].importedItems > 0 && data[i].skippedItems >= 0) {
+                    resultHtml += "<span class='label label-warning'>" +
+                        data[i].importedItems +
+                        " items imported successfully and " +
+                        data[i].skippedItems +
+                        " items were skipped</span>";
+                } else {
+                    resultHtml += "No items were imported";
+                }
+
+                resultHtml += "<br /><br />";
+                if (data[i].skippedItems > 0) {
+                    resultHtml += '<ul class="list-group">';
+                    for (var j = 0; j < data[i].skippedItemsDetails.length; j++) {
+                        var skipedItem = data[i].skippedItemsDetails[j];
+
+                        resultHtml +=
+                            '<li class="list-group-item list-group-item-warning"><b>Line ' +
+                            skipedItem.lineNumber +
+                            ':</b> ' +
+                            skipedItem.description +
+                            '</li>';
+                    }
+
+                    resultHtml += '</ul>';
+                }
+            }
+
+            $("#status").html(resultHtml);
+        }
+
+        $(document).ready(function() {
+            $("#uploadBtn").click(function() {
+                $("#uploadBtn").prop("disabled", true);
+                var formData = new FormData($('#data')[0]);
+                console.log(formData);
+                $.ajax({
+                    url: "/file/upload/",
+                    type: 'POST',
+                    data: formData,
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress",
+                            function(evt) {
+                                if (evt.lengthComputable) {
+                                    var percentComplete = Math.round(evt.loaded / evt.total * 100);
+                                    console.log(percentComplete);
+
+                                    var percentVal = percentComplete + '%';
+                                    $('#progressBar').width(percentVal);
+                                    $('#progressBar').attr("aria-valuenow", percentComplete);
+                                    $('#progressBar').html(percentVal);
+
+                                    if (percentComplete === 100) {
+                                        $('#status').html('<b> Importing... </b>');
+                                    } else {
+                                        $('#status').html('<b> Uploading... </b>');
+                                    }
+                                }
+                            },
+                            false);
+                        return xhr;
+                    },
+                    success: function(data) {
+                        $("#uploadBtn").prop("disabled", false);
+                        renderResults(data);
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        $("#uploadBtn").prop("disabled", false);
+                        $('#status').html(xhr.responseText);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                return false;
+            });
+        });
+    </script>
+}
+
+
+<form asp-action="Upload" asp-controller="File" id="data" method="post" enctype="multipart/form-data">
+    <h2>@ViewData["Title"]</h2>
+    <div class="row">
+        <div class="col-md-10">
+            <label class="custom-file">
+                <input type="file" name="file" accept=".csv" class="custom-file-input" onchange="$('.custom-file-control').attr('data-text', $(this).val());">
+                <span class="custom-file-control" data-text="Choose file..."></span>
+            </label>
+        </div>
+        <div class="col-md-2">
+            <input id="uploadBtn" class="btn btn-block btn-info" type="submit" value="Upload products">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12"><br/></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0"
+                     aria-valuemin="0" aria-valuemax="100" style="width:0">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div id="status"></div>
