@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using WebShop.Data;
 
 namespace WebShop.Services.ProductParser
 {
     public class ProductParser : IProductParser
     {
-        private readonly Regex _deliveredInRegEx = new Regex("(\\d)(-(\\d))? (\\w*)", RegexOptions.Compiled);
         private const string Delimiter = ",";
         private const int ExpectedAmountOfItems = 10;
 
@@ -22,8 +20,6 @@ namespace WebShop.Services.ProductParser
 
             try
             {
-                var deliveredRange = ParseDeliveryRange(parts[6]);
-
                 var product = new Product
                 {
                     Key = ParseKey(parts[0]),
@@ -32,8 +28,7 @@ namespace WebShop.Services.ProductParser
                     Description = parts[3],
                     Price = ParsePrice(parts[4]),
                     DiscountPrice = ParseDiscountPrice(parts[5]),
-                    DeliveredRangeFrom = deliveredRange.from,
-                    DeliveredRangeTo = deliveredRange.to,
+                    DeliveredIn = parts[6],
                     Q1 = parts[7],
                     Size = ParseSize(parts[8]),
                     Color = parts[9]
@@ -90,45 +85,6 @@ namespace WebShop.Services.ProductParser
             }
 
             return value;
-        }
-
-        private (TimeSpan from, TimeSpan to) ParseDeliveryRange(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                throw new FormatException("'Delivered in' is empty. Each product should have a delivered in field. Please check the line");
-            }
-
-            input = input.Trim().ToLower();
-
-            // regex approach is not the most efficient, could be replaced with simple string manipulation logic if needed. 
-            var result = _deliveredInRegEx.Match(input);
-            if (!result.Success || result.Groups.Count != 5)
-            {
-                throw new FormatException("'Delivered in' has wrong format. Expected format <number>-<number?> <period>. For example '1-3 werkdagen', '3 maanden'");
-            }
-
-            // we can parse without TryParse since regex already checked for proper format
-            int firstInterval = int.Parse(result.Groups[1].Value);
-            int secondInteval = firstInterval;
-            if (result.Groups[3].Success)
-            {
-                secondInteval = int.Parse(result.Groups[3].Value);
-            }
-
-            var period = result.Groups[4].Value.Trim().ToLower();
-
-            switch (period)
-            {
-                case "werkdagen":
-                case "werkdag":
-                    return (from: new TimeSpan(firstInterval, 0, 0), new TimeSpan(secondInteval, 0, 0));
-                case "maanden":
-                case "maand":
-                    return (from: new TimeSpan(firstInterval * 30, 0, 0), new TimeSpan(secondInteval * 30, 0, 0));
-                default:
-                    throw new FormatException($"Cannot parse 'Delivered in' period. '{period}' is unknown");
-            }
         }
 
         private string ParseKey(string input)

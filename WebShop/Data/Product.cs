@@ -16,8 +16,9 @@ namespace WebShop.Data
         public string Description { get; set; }
         public double Price { get; set; }
         public double? DiscountPrice { get; set; }
-        public TimeSpan DeliveredRangeFrom { get; set; }
-        public TimeSpan DeliveredRangeTo { get; set; }
+        // could be changed to more specific data type to hold range. 
+        // keep it simple for now
+        public string DeliveredIn { get; set; }
         public string Q1 { get; set; }
 
         // I assume that size should be an integer, last row in the example is corrupted and user will see warning message

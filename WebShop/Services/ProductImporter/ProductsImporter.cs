@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using WebShop.Data.ProductRepository;
 using WebShop.Services.ProductParser;
 
 namespace WebShop.Services.ProductImporter
@@ -7,10 +8,12 @@ namespace WebShop.Services.ProductImporter
     public class ProductsImporter : IProductsImporter
     {
         private readonly IProductParser _productParser;
+        private readonly IProductRepository _productRepository;
 
-        public ProductsImporter(IProductParser productParser)
+        public ProductsImporter(IProductParser productParser, IProductRepository productRepository)
         {
             _productParser = productParser;
+            _productRepository = productRepository;
         }
 
         public const string Header =
@@ -51,6 +54,7 @@ namespace WebShop.Services.ProductImporter
                     }
                     
                     // save or update
+                    await _productRepository.AddOrUpdate(parsingResult.Product);
                     result.ImportedItems++;
                 }
             }

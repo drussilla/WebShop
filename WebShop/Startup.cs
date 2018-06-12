@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WebShop.Data;
+using WebShop.Data.ProductRepository;
 using WebShop.Services.ProductImporter;
 using WebShop.Services.ProductParser;
 
@@ -41,6 +42,8 @@ namespace WebShop
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddScoped<IProductsImporter, ProductsImporter>();
             services.AddScoped<IProductParser, ProductParser>();
