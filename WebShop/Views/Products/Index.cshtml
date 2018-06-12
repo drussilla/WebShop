@@ -1,0 +1,98 @@
+﻿@model WebShop.Models.PaginatedList<WebShop.Data.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h2>Products (@Model.TotalAmount items)</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Key)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().ArticleCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().ColorCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().DiscountPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().DeliveredIn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Q1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Size)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Color)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Key)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ArticleCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ColorCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscountPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveredIn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Q1)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Size)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Color)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-page="@(Model.PageNumber - 1)"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-page="@(Model.PageNumber + 1)"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
