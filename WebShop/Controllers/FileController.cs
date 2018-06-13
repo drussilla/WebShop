@@ -38,7 +38,7 @@ namespace WebShop.Controllers
             
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
-            List<ImportResult> results = new List<ImportResult>();
+            var results = new List<ImportResult>();
 
             var section = await reader.ReadNextSectionAsync();
             while (section != null)

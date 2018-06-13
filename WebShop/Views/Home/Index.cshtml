@@ -22,11 +22,11 @@
                         data[i].skippedItems +
                         " items were skipped</span>";
                 } else {
-                    resultHtml += "No items were imported";
+                    resultHtml += "<span class='label label-danger'>No items were imported. Please check file format</span>";
                 }
 
                 resultHtml += "<br /><br />";
-                if (data[i].skippedItems > 0) {
+                if (data[i].skippedItems > 0 && data[i].importedItems > 0) {
                     resultHtml += '<ul class="list-group">';
                     for (var j = 0; j < data[i].skippedItemsDetails.length; j++) {
                         var skipedItem = data[i].skippedItemsDetails[j];

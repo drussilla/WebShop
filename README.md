@@ -2,6 +2,16 @@ Prereuisites:
 
 .NET Core 2.1
 
-build
+Change connection string in WebShop\appsettings.json
 
-run
+Build solution:
+
+dotnet build
+
+Run tests:
+
+dotnet test WebShop.UnitTests
+
+Run project:
+
+dotnet run --project WebShop
